@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jmwri/luckydice/domain"
 	"log"
@@ -38,16 +39,36 @@ func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	content = strings.TrimPrefix(content, messagePrefix)
 	content = strings.TrimSpace(content)
 
-	input, err := h.inputParser.Parse(content)
-	if err != nil {
-		return
+	var response string
+	if content == "help" {
+		response = h.buildHelp(m)
+	} else {
+		response = h.parseRoll(content, m)
 	}
-	output := h.roller.Roll(input)
-	response := h.outputBuilder.Build(m.Author.Mention(), output)
+
 	log.Println(content, response)
 
-	_, err = s.ChannelMessageSend(m.ChannelID, response)
+	_, err := s.ChannelMessageSend(m.ChannelID, response)
 	if err != nil {
 		log.Println("failed to send msg")
+	}
+}
+
+func (h *Handler) buildHelp(m *discordgo.MessageCreate) string {
+	lines := []string{
+		fmt.Sprintf("Hi %s! You can use me by typing the following: `%s {number of rolls} d{sides on die} {modifier}`. For example: `%s 2 d20 +3`.", m.Author.Mention(), messagePrefix, messagePrefix),
+		fmt.Sprintf("All whitespace is optional, and you can exclude {number of rolls} and {modifier}."),
+		fmt.Sprintf("`%s 1d20+0` is the same as `%s d20`.", messagePrefix, messagePrefix),
+	}
+	return strings.Join(lines, "\n")
+}
+
+func (h *Handler) parseRoll(content string, m *discordgo.MessageCreate) string {
+	input, err := h.inputParser.Parse(content)
+	if err != nil {
+		return fmt.Sprintf("Sorry %s, I don't understand. You can ask me for help with `%s help`.", m.Author.Mention(), messagePrefix)
+	} else {
+		output := h.roller.Roll(input)
+		return h.outputBuilder.Build(m.Author.Mention(), output)
 	}
 }
