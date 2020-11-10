@@ -49,3 +49,25 @@ func TestRoller_Roll(t *testing.T) {
 		})
 	}
 }
+
+func TestRoller_Roll_AllNumbersCanBeGenerated(t *testing.T) {
+	rand.Seed(1234)
+	roller := application.NewRoller()
+
+	input := domain.RollInput{
+		NumRolls: 1,
+		MaxRoll:  20,
+		Modifier: 0,
+	}
+
+	generatedNumbersCount := make(map[int]int)
+
+	for i := 0; i < 1000; i++ {
+		output := roller.Roll(input)
+		generatedNumbersCount[output.Result]++
+	}
+
+	if len(generatedNumbersCount) != input.MaxRoll {
+		t.Errorf("expected %d entries, got %d", input.MaxRoll, len(generatedNumbersCount))
+	}
+}

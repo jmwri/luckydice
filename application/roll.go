@@ -16,7 +16,7 @@ func (r *Roller) Roll(input domain.RollInput) domain.RollOutput {
 	rolls := make([]int, input.NumRolls)
 	total := 0
 	for i := 0; i < input.NumRolls; i++ {
-		roll := rand.Intn(input.MaxRoll-1) + 1
+		roll := rand.Intn(input.MaxRoll) + 1
 		rolls[i] = roll
 		total += roll
 	}
