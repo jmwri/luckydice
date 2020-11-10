@@ -41,6 +41,7 @@ func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	input := h.inputParser.Parse(content)
 	output := h.roller.Roll(input)
 	response := h.outputBuilder.Build(m.Author.Mention(), output)
+	log.Println(content, response)
 
 	_, err := s.ChannelMessageSend(m.ChannelID, response)
 	if err != nil {
