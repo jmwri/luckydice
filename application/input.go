@@ -42,35 +42,45 @@ func (r *InputParser) toMap(s string) map[string]string {
 	return paramsMap
 }
 
-func (r *InputParser) Parse(s string) domain.RollInput {
+func (r *InputParser) Parse(s string) (domain.RollInput, error) {
 	mapped := r.toMap(s)
 
 	roll := domain.RollInput{
 		NumRolls: 1,
-		MaxRoll:  20,
+		MaxRoll:  0,
 		Modifier: 0,
 	}
 
-	if val, ok := mapped["num"]; ok {
+	if val, ok := mapped["num"]; ok && val != "" {
 		numRolls, err := strconv.Atoi(val)
-		if err == nil {
-			roll.NumRolls = numRolls
+		if err != nil {
+			return roll, domain.ErrInvalidInput
 		}
+		roll.NumRolls = numRolls
 	}
 
-	if val, ok := mapped["max"]; ok {
+	if val, ok := mapped["max"]; ok && val != "" {
 		maxRoll, err := strconv.Atoi(val)
-		if err == nil {
-			roll.MaxRoll = maxRoll
+		if err != nil {
+			return roll, domain.ErrInvalidInput
 		}
+		roll.MaxRoll = maxRoll
 	}
 
-	if val, ok := mapped["mod"]; ok {
+	if val, ok := mapped["mod"]; ok && val != "" {
 		modifier, err := strconv.Atoi(val)
-		if err == nil {
-			roll.Modifier = modifier
+		if err != nil {
+			return roll, domain.ErrInvalidInput
 		}
+		roll.Modifier = modifier
 	}
 
-	return roll
+	if roll.NumRolls < 1 {
+		return roll, domain.ErrInvalidInput
+	}
+	if roll.MaxRoll < 1 {
+		return roll, domain.ErrInvalidInput
+	}
+
+	return roll, nil
 }

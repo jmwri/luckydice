@@ -1,6 +1,7 @@
 package application_test
 
 import (
+	"errors"
 	"github.com/jmwri/luckydice/application"
 	"github.com/jmwri/luckydice/domain"
 	"testing"
@@ -75,9 +76,35 @@ func TestParser_Parse(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			out := parser.Parse(test.input)
-			if out != test.exp {
+			out, err := parser.Parse(test.input)
+			if err != nil {
+				t.Errorf("unexpected error: %s", err)
+			} else if out != test.exp {
 				t.Errorf("expected %v, got %v", test.exp, out)
+			}
+		})
+	}
+}
+
+func TestParser_Parse_InvalidInput(t *testing.T) {
+	t.Parallel()
+	parser := application.NewInputParser()
+
+	tests := []struct {
+		name  string
+		input string
+	}{
+		{"num rolls must be at least 1", "0d6"},
+		{"max roll must be at least 1", "1d0"},
+		{"invalid pattern", "xd5-1"},
+	}
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			_, err := parser.Parse(test.input)
+			if !errors.Is(err, domain.ErrInvalidInput) {
+				t.Errorf("expected %s, got %s", domain.ErrInvalidInput, err)
 			}
 		})
 	}

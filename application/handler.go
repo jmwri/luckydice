@@ -38,12 +38,15 @@ func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 	content = strings.TrimPrefix(content, messagePrefix)
 	content = strings.TrimSpace(content)
 
-	input := h.inputParser.Parse(content)
+	input, err := h.inputParser.Parse(content)
+	if err != nil {
+		return
+	}
 	output := h.roller.Roll(input)
 	response := h.outputBuilder.Build(m.Author.Mention(), output)
 	log.Println(content, response)
 
-	_, err := s.ChannelMessageSend(m.ChannelID, response)
+	_, err = s.ChannelMessageSend(m.ChannelID, response)
 	if err != nil {
 		log.Println("failed to send msg")
 	}
