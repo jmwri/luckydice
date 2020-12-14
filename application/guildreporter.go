@@ -3,18 +3,20 @@ package application
 import (
 	"context"
 	"github.com/bwmarrin/discordgo"
-	"log"
+	"go.uber.org/zap"
 	"time"
 )
 
-func NewGuildReporter(dg *discordgo.Session, period time.Duration) *GuildReporter {
+func NewGuildReporter(logger *zap.Logger, dg *discordgo.Session, period time.Duration) *GuildReporter {
 	return &GuildReporter{
+		logger: logger,
 		dg:     dg,
 		period: period,
 	}
 }
 
 type GuildReporter struct {
+	logger *zap.Logger
 	dg     *discordgo.Session
 	period time.Duration
 }
@@ -33,7 +35,7 @@ func (r *GuildReporter) Start(ctx context.Context) {
 }
 
 func (r *GuildReporter) logGuilds() {
-	pageSize := 1
+	pageSize := 100
 
 	lastGuildID := ""
 	totGuilds := 0
@@ -42,7 +44,7 @@ func (r *GuildReporter) logGuilds() {
 	for numRequests == 0 || lastRequestSize >= pageSize {
 		guilds, err := r.dg.UserGuilds(pageSize, "", lastGuildID)
 		if err != nil {
-			log.Println(err)
+			r.logger.Error("failed to request discord guilds", zap.Error(err))
 			return
 		}
 		numRequests++
@@ -53,5 +55,5 @@ func (r *GuildReporter) logGuilds() {
 		}
 		lastGuildID = guilds[lastRequestSize-1].ID
 	}
-	log.Printf("Currently connected to %d guilds", totGuilds)
+	r.logger.Info("checked guild membership", zap.Int("count", totGuilds))
 }

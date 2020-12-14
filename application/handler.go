@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jmwri/luckydice/domain"
-	"log"
+	"go.uber.org/zap"
 	"strings"
 )
 
 const messagePrefix = "!roll"
 
-func NewHandler(inputParser domain.InputParser, roller domain.Roller, outputBuilder domain.OutputBuilder) *Handler {
+func NewHandler(logger *zap.Logger, inputParser domain.InputParser, roller domain.Roller, outputBuilder domain.OutputBuilder) *Handler {
 	return &Handler{
+		logger:        logger,
 		inputParser:   inputParser,
 		roller:        roller,
 		outputBuilder: outputBuilder,
@@ -19,6 +20,7 @@ func NewHandler(inputParser domain.InputParser, roller domain.Roller, outputBuil
 }
 
 type Handler struct {
+	logger        *zap.Logger
 	inputParser   domain.InputParser
 	roller        domain.Roller
 	outputBuilder domain.OutputBuilder
@@ -46,11 +48,15 @@ func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 		response = h.parseRoll(content, m)
 	}
 
-	log.Println(content, response)
+	h.logger.Info(
+		"responded to message",
+		zap.String("request", content),
+		zap.String("response", response),
+	)
 
 	_, err := s.ChannelMessageSend(m.ChannelID, response)
 	if err != nil {
-		log.Println("failed to send msg")
+		h.logger.Error("failed to send message", zap.Error(err))
 	}
 }
 

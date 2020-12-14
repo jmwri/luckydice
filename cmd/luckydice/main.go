@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/jmwri/luckydice/application"
+	"go.uber.org/zap"
 	"log"
 	"os"
 	"os/signal"
@@ -14,19 +14,24 @@ import (
 )
 
 func main() {
+	logger, err := zap.NewProduction()
+	if err != nil {
+		log.Panicf("unable to create logger: %s", err)
+	}
+	defer logger.Sync()
 	// Get the bot token from environment
 	token := os.Getenv("DISCORD_TOKEN")
 	// Create a new Discord session using the provided bot token
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
-		log.Fatalf("error creating discord session: %s", err)
+		logger.Fatal("error creating discord session", zap.Error(err))
 		return
 	}
 
 	inputParser := application.NewInputParser()
 	roller := application.NewRoller()
 	outputBuilder := application.NewOutputBuilder()
-	handler := application.NewHandler(inputParser, roller, outputBuilder)
+	handler := application.NewHandler(logger, inputParser, roller, outputBuilder)
 
 	// Register the handler func as a callback for MessageCreate events.
 	dg.AddHandler(handler.Handle)
@@ -37,16 +42,16 @@ func main() {
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
 	if err != nil {
-		fmt.Println("error opening connection,", err)
+		logger.Error("error connecting to discord", zap.Error(err))
 		return
 	}
 
 	ctx := context.Background()
-	guildReporter := application.NewGuildReporter(dg, time.Hour)
+	guildReporter := application.NewGuildReporter(logger, dg, time.Minute*30)
 	go guildReporter.Start(ctx)
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	logger.Info("bot is now running")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
