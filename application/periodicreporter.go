@@ -7,18 +7,20 @@ import (
 	"time"
 )
 
-func NewPeriodicReporter(logger *zap.Logger, period time.Duration, guildCountProvider stats.GuildCountProvider) *PeriodicReporter {
+func NewPeriodicReporter(logger *zap.Logger, period time.Duration, guildCountProvider stats.GuildCountProvider, periodStatsProvider stats.PeriodStatsProvider) *PeriodicReporter {
 	return &PeriodicReporter{
-		logger:             logger,
-		period:             period,
-		guildCountProvider: guildCountProvider,
+		logger:              logger,
+		period:              period,
+		guildCountProvider:  guildCountProvider,
+		periodStatsProvider: periodStatsProvider,
 	}
 }
 
 type PeriodicReporter struct {
-	logger             *zap.Logger
-	period             time.Duration
-	guildCountProvider stats.GuildCountProvider
+	logger              *zap.Logger
+	period              time.Duration
+	guildCountProvider  stats.GuildCountProvider
+	periodStatsProvider stats.PeriodStatsProvider
 }
 
 func (r *PeriodicReporter) Start(ctx context.Context) {
@@ -42,8 +44,14 @@ func (r *PeriodicReporter) report() {
 		return
 	}
 
+	periodStats := r.periodStatsProvider.LastPeriodStats()
+
 	r.logger.Info(
 		"periodic stat report",
 		zap.Int("connectedGuilds", connectedGuilds),
+		zap.String("period", r.period.String()),
+		zap.Int("numRolls", periodStats.Rolls),
+		zap.Int("numMisunderstandings", periodStats.Misunderstandings),
+		zap.Int("numHelps", periodStats.Helps),
 	)
 }

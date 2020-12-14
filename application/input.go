@@ -4,6 +4,7 @@ import (
 	"github.com/jmwri/luckydice/domain"
 	"regexp"
 	"strconv"
+	"sync"
 )
 
 func NewInputParser() *InputParser {
@@ -83,4 +84,64 @@ func (r *InputParser) Parse(s string) (domain.RollInput, error) {
 	}
 
 	return roll, nil
+}
+
+func NewInputRecorder() *InputRecorder {
+	return &InputRecorder{
+		numRolls:             0,
+		numMisunderstandings: 0,
+		numHelps:             0,
+		mutex:                sync.Mutex{},
+	}
+}
+
+type InputRecorder struct {
+	numRolls             int
+	numMisunderstandings int
+	numHelps             int
+	mutex                sync.Mutex
+}
+
+func (r *InputRecorder) RecordRoll(input domain.RollInput) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.numRolls++
+}
+
+func (r *InputRecorder) Rolls() int {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	return r.numRolls
+}
+
+func (r *InputRecorder) RecordMisunderstanding() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.numMisunderstandings++
+}
+
+func (r *InputRecorder) Misunderstandings() int {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	return r.numMisunderstandings
+}
+
+func (r *InputRecorder) RecordHelp() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.numHelps++
+}
+
+func (r *InputRecorder) Helps() int {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	return r.numHelps
+}
+
+func (r *InputRecorder) Reset() {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.numRolls = 0
+	r.numMisunderstandings = 0
+	r.numHelps = 0
 }

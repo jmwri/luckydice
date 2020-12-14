@@ -29,10 +29,11 @@ func main() {
 		return
 	}
 
+	inputRecorder := application.NewInputRecorder()
 	inputParser := application.NewInputParser()
 	roller := application.NewRoller()
 	outputBuilder := application.NewOutputBuilder()
-	handler := application.NewHandler(logger, inputParser, roller, outputBuilder)
+	handler := application.NewHandler(logger, inputParser, roller, outputBuilder, inputRecorder)
 
 	// Register the handler func as a callback for MessageCreate events.
 	dg.AddHandler(handler.Handle)
@@ -49,7 +50,8 @@ func main() {
 
 	ctx := context.Background()
 	guildCountProvider := stat.NewGuildCountProvider(dg)
-	periodicReporter := application.NewPeriodicReporter(logger, time.Minute*30, guildCountProvider)
+	periodStatsProvider := stat.NewPeriodStatsProvider(inputRecorder)
+	periodicReporter := application.NewPeriodicReporter(logger, time.Minute*30, guildCountProvider, periodStatsProvider)
 	go periodicReporter.Start(ctx)
 
 	// Wait here until CTRL-C or other term signal is received.

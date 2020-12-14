@@ -10,12 +10,13 @@ import (
 
 const messagePrefix = "!roll"
 
-func NewHandler(logger *zap.Logger, inputParser domain.InputParser, roller domain.Roller, outputBuilder domain.OutputBuilder) *Handler {
+func NewHandler(logger *zap.Logger, inputParser domain.InputParser, roller domain.Roller, outputBuilder domain.OutputBuilder, recorder domain.InputRecorder) *Handler {
 	return &Handler{
 		logger:        logger,
 		inputParser:   inputParser,
 		roller:        roller,
 		outputBuilder: outputBuilder,
+		recorder:      recorder,
 	}
 }
 
@@ -24,6 +25,7 @@ type Handler struct {
 	inputParser   domain.InputParser
 	roller        domain.Roller
 	outputBuilder domain.OutputBuilder
+	recorder      domain.InputRecorder
 }
 
 func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -43,6 +45,7 @@ func (h *Handler) Handle(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	var response string
 	if content == "help" {
+		h.recorder.RecordHelp()
 		response = h.buildHelp(m)
 	} else {
 		response = h.parseRoll(content, m)
@@ -72,8 +75,10 @@ func (h *Handler) buildHelp(m *discordgo.MessageCreate) string {
 func (h *Handler) parseRoll(content string, m *discordgo.MessageCreate) string {
 	input, err := h.inputParser.Parse(content)
 	if err != nil {
+		h.recorder.RecordMisunderstanding()
 		return fmt.Sprintf("Sorry %s, I don't understand. You can ask me for help with `%s help`.", m.Author.Mention(), messagePrefix)
 	} else {
+		h.recorder.RecordRoll(input)
 		output := h.roller.Roll(input)
 		return h.outputBuilder.Build(m.Author.Mention(), output)
 	}
