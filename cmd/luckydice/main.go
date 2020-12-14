@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/jmwri/luckydice/application"
+	"github.com/jmwri/luckydice/application/stat"
 	"go.uber.org/zap"
 	"log"
 	"os"
@@ -47,8 +48,9 @@ func main() {
 	}
 
 	ctx := context.Background()
-	guildReporter := application.NewGuildReporter(logger, dg, time.Minute*30)
-	go guildReporter.Start(ctx)
+	guildCountProvider := stat.NewGuildCountProvider(dg)
+	periodicReporter := application.NewPeriodicReporter(logger, time.Minute*30, guildCountProvider)
+	go periodicReporter.Start(ctx)
 
 	// Wait here until CTRL-C or other term signal is received.
 	logger.Info("bot is now running")
