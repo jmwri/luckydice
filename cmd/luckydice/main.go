@@ -43,7 +43,7 @@ func main() {
 
 	ctx := context.Background()
 	guildReporter := application.NewGuildReporter(dg, time.Hour)
-	guildReporter.Start(ctx)
+	go guildReporter.Start(ctx)
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
