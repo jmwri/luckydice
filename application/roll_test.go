@@ -22,18 +22,18 @@ func TestRoller_Roll(t *testing.T) {
 			MaxRoll:  20,
 			Modifier: 2,
 		}, domain.RollOutput{
-			Rolls:    []int{13, 2},
+			Rolls:    []int{20, 19},
 			Modifier: 2,
-			Result:   17,
+			Result:   41,
 		}},
 		{"4d4-3", 456789, domain.RollInput{
 			NumRolls: 4,
 			MaxRoll:  4,
 			Modifier: -3,
 		}, domain.RollOutput{
-			Rolls:    []int{1, 3, 3, 2},
+			Rolls:    []int{4, 1, 2, 4},
 			Modifier: -3,
-			Result:   6,
+			Result:   8,
 		}},
 	}
 	for _, test := range tests {
