@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/jmwri/luckydice/application"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -39,11 +41,16 @@ func main() {
 		return
 	}
 
+	ctx := context.Background()
+	guildReporter := application.NewGuildReporter(dg, time.Hour)
+	guildReporter.Start(ctx)
+
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
+	ctx.Done()
 
 	// Cleanly close down the Discord session.
 	dg.Close()
