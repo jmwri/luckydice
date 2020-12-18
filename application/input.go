@@ -12,7 +12,7 @@ func NewInputParser() *InputParser {
 	// 2 d20 +3
 	patternParts := []string{
 		`^`,                 // start of string
-		`(?P<num>\d)?`,      // 2
+		`(?P<num>\d{0,2})?`, // 2
 		`d(?P<max>\d+)`,     // d20
 		`(?P<mod>[+-]\d+)?`, // +3
 		`$`,

@@ -71,6 +71,16 @@ func TestParser_Parse(t *testing.T) {
 			MaxRoll:  12,
 			Modifier: 0,
 		}},
+		{"10 rolls", "10 d20", domain.RollInput{
+			NumRolls: 10,
+			MaxRoll:  20,
+			Modifier: 0,
+		}},
+		{"99 rolls", "99 d20", domain.RollInput{
+			NumRolls: 99,
+			MaxRoll:  20,
+			Modifier: 0,
+		}},
 	}
 	for _, test := range tests {
 		test := test
@@ -95,6 +105,7 @@ func TestParser_Parse_InvalidInput(t *testing.T) {
 		input string
 	}{
 		{"num rolls must be at least 1", "0d6"},
+		{"num rolls cannot be more than 2 digits", "100d6"},
 		{"max roll must be at least 1", "1d0"},
 		{"invalid pattern", "xd5-1"},
 	}
