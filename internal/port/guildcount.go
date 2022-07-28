@@ -1,4 +1,4 @@
-package stats
+package port
 
 type GuildCountProvider interface {
 	GetGuildCount() (int, error)
