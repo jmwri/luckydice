@@ -6,6 +6,14 @@ type RollInput struct {
 	Modifier int
 }
 
+func NewRollOutput(rolls []int, modifier, result int) RollOutput {
+	return RollOutput{
+		Rolls:    rolls,
+		Modifier: modifier,
+		Result:   result,
+	}
+}
+
 type RollOutput struct {
 	Rolls    []int
 	Modifier int

@@ -14,10 +14,5 @@ func Roll(input domain.RollInput) (domain.RollOutput, error) {
 		total += roll
 	}
 
-	output := domain.RollOutput{
-		Rolls:    rolls,
-		Modifier: input.Modifier,
-		Result:   total + input.Modifier,
-	}
-	return output, nil
+	return domain.NewRollOutput(rolls, input.Modifier, total+input.Modifier), nil
 }
