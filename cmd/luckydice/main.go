@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/jmwri/luckydice/application"
-	"github.com/jmwri/luckydice/application/stat"
+	"fmt"
+	"github.com/jmwri/luckydice/internal"
+	"github.com/jmwri/luckydice/internal/adapter"
+	"github.com/jmwri/luckydice/internal/core"
 	"go.uber.org/zap"
 	"log"
 	"os"
@@ -29,14 +31,32 @@ func main() {
 		return
 	}
 
-	inputRecorder := application.NewInputRecorder()
-	inputParser := application.NewInputParser()
-	roller := application.NewRoller()
-	outputBuilder := application.NewOutputBuilder()
-	handler := application.NewHandler(logger, inputParser, roller, outputBuilder, inputRecorder)
+	var svc internal.Service = core.NewService("!roll")
+	dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.ID == s.State.User.ID {
+			return
+		}
 
-	// Register the handler func as a callback for MessageCreate events.
-	dg.AddHandler(handler.Handle)
+		err := svc.Handle(m.Author.Mention(), m.Content, func(response string) error {
+			_, err := s.ChannelMessageSend(m.ChannelID, response)
+			if err != nil {
+				return fmt.Errorf("failed to send message: %w", err)
+			}
+			logger.Info(
+				"handled message",
+				zap.String("request", m.Content),
+				zap.String("response", response),
+			)
+			return nil
+		})
+
+		if err != nil {
+			logger.Error(
+				"failed to handle message",
+				zap.Error(err),
+			)
+		}
+	})
 
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
@@ -49,9 +69,8 @@ func main() {
 	}
 
 	ctx := context.Background()
-	guildCountProvider := stat.NewGuildCountProvider(dg)
-	periodStatsProvider := stat.NewPeriodStatsProvider(inputRecorder)
-	periodicReporter := application.NewPeriodicReporter(logger, time.Minute*30, guildCountProvider, periodStatsProvider)
+	guildCountProvider := adapter.NewGuildCountProvider(dg)
+	periodicReporter := core.NewPeriodicReporter(logger, time.Minute*30, guildCountProvider, svc)
 	go periodicReporter.Start(ctx)
 
 	// Wait here until CTRL-C or other term signal is received.
@@ -62,5 +81,5 @@ func main() {
 	ctx.Done()
 
 	// Cleanly close down the Discord session.
-	dg.Close()
+	_ = dg.Close()
 }

@@ -1,4 +1,4 @@
-package stat
+package adapter
 
 import (
 	"github.com/bwmarrin/discordgo"
