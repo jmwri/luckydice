@@ -4,6 +4,8 @@
 ###
 FROM golang:1.14-alpine as base
 
+RUN apk add git
+
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
