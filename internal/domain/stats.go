@@ -7,16 +7,16 @@ func NewStats() ModifiableStats {
 }
 
 type Stats struct {
-	NumRoll    int64
-	NumHelp    int64
-	NumInvalid int64
+	NumRoll    int
+	NumHelp    int
+	NumInvalid int
 }
 
 type ModifiableStats struct {
 	Stats
 }
 
-func (s ModifiableStats) AddRolls(n int64) ModifiableStats {
+func (s ModifiableStats) AddRolls(n int) ModifiableStats {
 	s.NumRoll += n
 	return s
 }
@@ -25,7 +25,7 @@ func (s ModifiableStats) AddRoll() ModifiableStats {
 	return s.AddRolls(1)
 }
 
-func (s ModifiableStats) AddHelps(n int64) ModifiableStats {
+func (s ModifiableStats) AddHelps(n int) ModifiableStats {
 	s.NumHelp += n
 	return s
 }
@@ -34,7 +34,7 @@ func (s ModifiableStats) AddHelp() ModifiableStats {
 	return s.AddHelps(1)
 }
 
-func (s ModifiableStats) AddInvalids(n int64) ModifiableStats {
+func (s ModifiableStats) AddInvalids(n int) ModifiableStats {
 	s.NumInvalid += n
 	return s
 }

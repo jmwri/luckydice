@@ -51,8 +51,8 @@ func (r *PeriodicReporter) report() {
 		"periodic stat report",
 		zap.Int("connectedGuilds", connectedGuilds),
 		zap.String("period", r.period.String()),
-		zap.Int64("numRolls", periodStats.NumRoll),
-		zap.Int64("numInvalid", periodStats.NumInvalid),
-		zap.Int64("numHelps", periodStats.NumHelp),
+		zap.Int("numRolls", periodStats.NumRoll),
+		zap.Int("numInvalid", periodStats.NumInvalid),
+		zap.Int("numHelps", periodStats.NumHelp),
 	)
 }
