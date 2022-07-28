@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/jmwri/luckydice/internal"
 	"github.com/jmwri/luckydice/internal/adapter"
 	"github.com/jmwri/luckydice/internal/core"
@@ -37,25 +36,35 @@ func main() {
 			return
 		}
 
-		err := svc.Handle(m.Author.Mention(), m.Content, func(response string) error {
-			_, err := s.ChannelMessageSend(m.ChannelID, response)
-			if err != nil {
-				return fmt.Errorf("failed to send message: %w", err)
-			}
-			logger.Info(
-				"handled message",
-				zap.String("request", m.Content),
-				zap.String("response", response),
-			)
-			return nil
-		})
-
+		response, err := svc.Handle(m.Author.Mention(), m.Content)
 		if err != nil {
 			logger.Error(
-				"failed to handle message",
+				"failed to handle request",
+				zap.String("request", m.Content),
+				zap.String("response", response),
 				zap.Error(err),
 			)
 		}
+
+		if response == "" {
+			return
+		}
+
+		_, err = s.ChannelMessageSend(m.ChannelID, response)
+		if err != nil {
+			logger.Error(
+				"failed to send response",
+				zap.String("request", m.Content),
+				zap.String("response", response),
+				zap.Error(err),
+			)
+		}
+		logger.Info(
+			"handled request",
+			zap.String("request", m.Content),
+			zap.String("response", response),
+			zap.Error(err),
+		)
 	})
 
 	// In this example, we only care about receiving message events.

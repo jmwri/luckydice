@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"github.com/jmwri/luckydice/internal/domain"
-	"github.com/jmwri/luckydice/internal/port"
 	"strings"
 )
 
@@ -19,26 +18,26 @@ type Service struct {
 	stats         domain.ModifiableStats
 }
 
-func (s *Service) Handle(name, input string, outputReceiver port.OutputReceiver) error {
+func (s *Service) Handle(name, input string) (string, error) {
 	input = strings.ToLower(input)
 
 	if !strings.HasPrefix(input, s.messagePrefix) {
-		return nil
+		return "", nil
 	}
 	input = strings.TrimPrefix(input, s.messagePrefix)
 	input = strings.TrimSpace(input)
 
 	if input == "help" {
 		s.stats.AddHelp()
-		return outputReceiver(GetHelpOutput(name, s.messagePrefix))
+		return GetHelpOutput(name, s.messagePrefix), nil
 	}
 	output, err := s.roll(input)
 	if err != nil {
 		s.stats.AddInvalid()
-		return outputReceiver(GetInvalidOutput(name, s.messagePrefix))
+		return GetInvalidOutput(name, s.messagePrefix), nil
 	}
 	s.stats.AddRoll()
-	return outputReceiver(GetSuccessfulOutput(name, output))
+	return GetSuccessfulOutput(name, output), nil
 }
 
 func (s *Service) roll(input string) (domain.RollOutput, error) {

@@ -2,10 +2,9 @@ package internal
 
 import (
 	"github.com/jmwri/luckydice/internal/domain"
-	"github.com/jmwri/luckydice/internal/port"
 )
 
 type Service interface {
-	Handle(name, input string, outputReceiver port.OutputReceiver) error
+	Handle(name, input string) (string, error)
 	Stats() domain.Stats
 }
