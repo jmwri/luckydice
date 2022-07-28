@@ -1,5 +1,13 @@
 package domain
 
+func NewRollInput(rolls, max, mod int) RollInput {
+	return RollInput{
+		NumRolls: rolls,
+		MaxRoll:  max,
+		Modifier: mod,
+	}
+}
+
 type RollInput struct {
 	NumRolls int
 	MaxRoll  int
