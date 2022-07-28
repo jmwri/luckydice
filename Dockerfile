@@ -2,7 +2,7 @@
 # Base
 # Downloads go dependencies and builds the application
 ###
-FROM golang:1.14-alpine as base
+FROM golang:1.18-alpine as base
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
