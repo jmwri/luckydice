@@ -47,7 +47,7 @@ func GetSuccessfulOutput(name string, input domain.RollInput, output domain.Roll
 		stringRolls[k] = strconv.Itoa(v)
 	}
 	rolls := strings.Join(stringRolls, ",")
-	return fmt.Sprintf("%s rolled (%s) [%s]%+d. Result: **%d**", name, inputStr, rolls, output.Modifier, output.Result)
+	return fmt.Sprintf("%s rolled %s [%s]%+d. Result: **%d**", name, inputStr, rolls, output.Modifier, output.Result)
 }
 
 func GetUpdatedOutput(name, rollCmdName, rollUtilCmdName string) string {

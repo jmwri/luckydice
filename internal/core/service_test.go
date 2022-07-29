@@ -37,17 +37,17 @@ func TestService_HandleRoll(t *testing.T) {
 		{
 			name:     "John",
 			input:    "2d20+5",
-			expected: "John rolled (2d20+5) [1,19]+5. Result: **25**",
+			expected: "John rolled 2d20+5 [1,19]+5. Result: **25**",
 		},
 		{
 			name:     "Jim",
 			input:    "5 d20-5",
-			expected: "Jim rolled (5d20-5) [6,9,19,11,6]-5. Result: **46**",
+			expected: "Jim rolled 5d20-5 [6,9,19,11,6]-5. Result: **46**",
 		},
 		{
 			name:     "Holly",
 			input:    "d8",
-			expected: "Holly rolled (1d8+0) [6]+0. Result: **6**",
+			expected: "Holly rolled 1d8+0 [6]+0. Result: **6**",
 		},
 		{
 			name:     "@1239876412334234",
