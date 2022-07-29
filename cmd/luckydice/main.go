@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jmwri/luckydice/internal"
 	"github.com/jmwri/luckydice/internal/core"
@@ -91,6 +92,9 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			case opts.RollCmdInputName:
 				content, err = svc.HandleRoll(i.Member.Mention(), opt.StringValue())
 				break
+			default:
+				content = fmt.Sprintf("Unknown command: %s", opt.Name)
+				break
 			}
 		}
 
@@ -122,6 +126,9 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				break
 			case opts.RollUtilStatsCmdName:
 				content, err = svc.HandleStats(i.Member.Mention())
+				break
+			default:
+				content = fmt.Sprintf("Unknown command: %s", opt.Name)
 				break
 			}
 		}
