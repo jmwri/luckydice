@@ -1,38 +1,19 @@
 package adapter
 
-import (
-	"github.com/bwmarrin/discordgo"
-)
-
-func NewGuildCountProvider(dg *discordgo.Session) *GuildCountProvider {
+func NewGuildCountProvider() *GuildCountProvider {
 	return &GuildCountProvider{
-		dg: dg,
+		count: 0,
 	}
 }
 
 type GuildCountProvider struct {
-	dg *discordgo.Session
+	count int
 }
 
-func (r *GuildCountProvider) GetGuildCount() (int, error) {
-	pageSize := 100
+func (r *GuildCountProvider) GetGuildCount() int {
+	return r.count
+}
 
-	lastGuildID := ""
-	totGuilds := 0
-	numRequests := 0
-	lastRequestSize := 0
-	for numRequests == 0 || lastRequestSize >= pageSize {
-		guilds, err := r.dg.UserGuilds(pageSize, "", lastGuildID)
-		if err != nil {
-			return totGuilds, err
-		}
-		numRequests++
-		totGuilds += len(guilds)
-		lastRequestSize = len(guilds)
-		if lastRequestSize == 0 {
-			continue
-		}
-		lastGuildID = guilds[lastRequestSize-1].ID
-	}
-	return totGuilds, nil
+func (r *GuildCountProvider) SetGuildCount(num int) {
+	r.count = num
 }

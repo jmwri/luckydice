@@ -1,5 +1,6 @@
 package port
 
 type GuildCountProvider interface {
-	GetGuildCount() (int, error)
+	GetGuildCount() int
+	SetGuildCount(num int)
 }

@@ -1,9 +1,9 @@
 package domain
 
-func NewStats() ModifiableStats {
-	return ModifiableStats{
-		Stats: Stats{},
-	}
+import "time"
+
+func NewStats() Stats {
+	return Stats{}
 }
 
 type Stats struct {
@@ -13,50 +13,42 @@ type Stats struct {
 	NumStat    int
 }
 
-type ModifiableStats struct {
-	Stats
-}
-
-func (s ModifiableStats) AddRolls(n int) ModifiableStats {
+func (s Stats) AddRolls(n int) Stats {
 	s.NumRoll += n
 	return s
 }
 
-func (s ModifiableStats) AddRoll() ModifiableStats {
-	return s.AddRolls(1)
-}
-
-func (s ModifiableStats) AddHelps(n int) ModifiableStats {
+func (s Stats) AddHelps(n int) Stats {
 	s.NumHelp += n
 	return s
 }
 
-func (s ModifiableStats) AddHelp() ModifiableStats {
-	return s.AddHelps(1)
-}
-
-func (s ModifiableStats) AddInvalids(n int) ModifiableStats {
+func (s Stats) AddInvalids(n int) Stats {
 	s.NumInvalid += n
 	return s
 }
 
-func (s ModifiableStats) AddInvalid() ModifiableStats {
-	return s.AddInvalids(1)
-}
-
-func (s ModifiableStats) AddStats(n int) ModifiableStats {
+func (s Stats) AddStats(n int) Stats {
 	s.NumStat += n
 	return s
 }
 
-func (s ModifiableStats) AddStat() ModifiableStats {
-	return s.AddStats(1)
+func NewStatsResult(period time.Duration, numGuild, numRoll, numHelp, numInvalid, numStat int) StatsResult {
+	return StatsResult{
+		Period:     period,
+		NumGuild:   numGuild,
+		NumRoll:    numRoll,
+		NumHelp:    numHelp,
+		NumInvalid: numInvalid,
+		NumStat:    numStat,
+	}
 }
 
-func (s ModifiableStats) Reset() ModifiableStats {
-	return NewStats()
-}
-
-func (s ModifiableStats) Result() Stats {
-	return s.Stats
+type StatsResult struct {
+	Period     time.Duration
+	NumGuild   int
+	NumRoll    int
+	NumHelp    int
+	NumInvalid int
+	NumStat    int
 }

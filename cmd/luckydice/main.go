@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/jmwri/luckydice/internal"
+	"github.com/jmwri/luckydice/internal/adapter"
 	"github.com/jmwri/luckydice/internal/core"
 	"github.com/jmwri/luckydice/internal/domain"
+	"github.com/jmwri/luckydice/internal/port"
 	"go.uber.org/zap"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 var logger *zap.Logger
@@ -45,7 +48,10 @@ var opts = domain.ServiceOpts{
 	RollUtilStatsCmdName: "stats",
 	OldPrefix:            "!roll",
 }
-var svc internal.Service = core.NewService(opts)
+
+var guildCountProvider port.GuildCountProvider = adapter.NewGuildCountProvider()
+var statsRegistry port.StatsRegistry = adapter.NewStatsRegistry(time.Now(), guildCountProvider)
+var svc internal.Service = core.NewService(opts, statsRegistry)
 
 var commands = []*discordgo.ApplicationCommand{
 	{
@@ -125,6 +131,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				content, err = svc.HandleHelp(i.Member.Mention())
 				break
 			case opts.RollUtilStatsCmdName:
+				guildCountProvider.SetGuildCount(len(s.State.Guilds))
 				content, err = svc.HandleStats(i.Member.Mention())
 				break
 			default:
@@ -160,6 +167,48 @@ func init() {
 		// Run the handler
 		handler(s, i)
 	})
+}
+
+func init() {
+	dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.ID == s.State.User.ID {
+			return
+		}
+
+		response, err := svc.HandleRaw(m.Author.Mention(), m.Content)
+
+		if err != nil {
+			logger.Error(
+				"failed to handle request",
+				zap.String("request", m.Content),
+				zap.String("response", response),
+				zap.Error(err),
+			)
+		}
+
+		if response == "" {
+			return
+		}
+
+		_, err = s.ChannelMessageSend(m.ChannelID, response)
+		if err != nil {
+			logger.Error(
+				"failed to send response",
+				zap.String("request", m.Content),
+				zap.String("response", response),
+				zap.Error(err),
+			)
+		}
+		logger.Info(
+			"handled request",
+			zap.String("request", m.Content),
+			zap.String("response", response),
+			zap.Error(err),
+		)
+	})
+
+	// In this example, we only care about receiving message events.
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildMessages)
 }
 
 func main() {
