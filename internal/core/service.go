@@ -5,19 +5,20 @@ import (
 	"github.com/jmwri/luckydice/internal/domain"
 	"github.com/jmwri/luckydice/internal/port"
 	"strings"
-	"time"
 )
 
-func NewService(opts domain.ServiceOpts, stats port.StatsRegistry) *Service {
+func NewService(opts domain.ServiceOpts, stats port.StatsRegistry, timeProvider port.TimeProvider) *Service {
 	return &Service{
-		opts:  opts,
-		stats: stats,
+		opts:         opts,
+		stats:        stats,
+		timeProvider: timeProvider,
 	}
 }
 
 type Service struct {
-	opts  domain.ServiceOpts
-	stats port.StatsRegistry
+	opts         domain.ServiceOpts
+	stats        port.StatsRegistry
+	timeProvider port.TimeProvider
 }
 
 func (s *Service) HandleRoll(name, input string) (string, error) {
@@ -42,12 +43,12 @@ func (s *Service) handleInvalid(name string) (string, error) {
 
 func (s *Service) HandleHelp(name string) (string, error) {
 	s.stats.AddHelp()
-	return GetHelpOutput(name, s.opts.RollUtilCmdName, s.opts.RollUtilHelpCmdName), nil
+	return GetHelpOutput(name, s.opts.RollCmdName), nil
 }
 
 func (s *Service) HandleStats(name string) (string, error) {
 	s.stats.AddStat()
-	stats, err := s.stats.Get(time.Now())
+	stats, err := s.stats.Get(s.timeProvider.Now())
 	if err != nil {
 		return "", fmt.Errorf("failed to get stats: %w", err)
 	}

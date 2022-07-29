@@ -37,7 +37,7 @@ func GetStatsOutput(name string, stats domain.StatsResult) string {
 func GetSuccessfulOutput(name string, input domain.RollInput, output domain.RollOutput) string {
 	modSymbol := "+"
 	if input.Modifier < 0 {
-		modSymbol = "-"
+		modSymbol = ""
 	}
 	inputStr := fmt.Sprintf("%dd%d%s%d", input.NumRolls, input.MaxRoll, modSymbol, input.Modifier)
 

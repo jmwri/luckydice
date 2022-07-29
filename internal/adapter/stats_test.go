@@ -9,7 +9,8 @@ import (
 )
 
 func TestNewStatsRegistry_Get(t *testing.T) {
-	now := time.Now()
+	timeProvider := adapter.NewCurrentTimeProvider()
+	now := timeProvider.Now()
 	after := now.Add(time.Minute * 10)
 	guildCountProvider := adapter.NewGuildCountProvider()
 	guildCountProvider.SetGuildCount(1000)

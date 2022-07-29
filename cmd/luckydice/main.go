@@ -13,7 +13,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 var logger *zap.Logger
@@ -50,8 +49,9 @@ var opts = domain.ServiceOpts{
 }
 
 var guildCountProvider port.GuildCountProvider = adapter.NewGuildCountProvider()
-var statsRegistry port.StatsRegistry = adapter.NewStatsRegistry(time.Now(), guildCountProvider)
-var svc internal.Service = core.NewService(opts, statsRegistry)
+var timeProvider port.TimeProvider = adapter.NewCurrentTimeProvider()
+var statsRegistry port.StatsRegistry = adapter.NewStatsRegistry(timeProvider.Now(), guildCountProvider)
+var svc internal.Service = core.NewService(opts, statsRegistry, timeProvider)
 
 var commands = []*discordgo.ApplicationCommand{
 	{
