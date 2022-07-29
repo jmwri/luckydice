@@ -45,7 +45,7 @@ func GetSuccessfulOutput(name string, output domain.RollOutput) string {
 
 func GetUpdatedOutput(name, rollCmdName, rollUtilCmdName string) string {
 	lines := []string{
-		fmt.Sprintf("%s this bot is now using slash commands as suggested by discord.", name),
+		fmt.Sprintf("%s, this bot is now using slash commands as suggested by discord.", name),
 		fmt.Sprintf("Please use `/%s` and `/%s` from now on!", rollCmdName, rollUtilCmdName),
 	}
 	return strings.Join(lines, "\n")
