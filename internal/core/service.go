@@ -62,6 +62,7 @@ func (s *Service) HandleRaw(name, input string) (string, error) {
 	if !strings.HasPrefix(input, s.opts.OldPrefix) {
 		return "", nil
 	}
+	s.stats.AddOld()
 
 	return GetUpdatedOutput(name, s.opts.RollCmdName, s.opts.RollUtilCmdName), nil
 }

@@ -40,11 +40,13 @@ func TestNewStatsResult(t *testing.T) {
 	helps := 80
 	invalids := 50
 	stats := 30
-	r := domain.NewStatsResult(period, guilds, rolls, helps, invalids, stats)
+	olds := 20
+	r := domain.NewStatsResult(period, guilds, rolls, helps, invalids, stats, olds)
 	assert.Equal(t, period, r.Period)
 	assert.Equal(t, guilds, r.NumGuild)
 	assert.Equal(t, rolls, r.NumRoll)
 	assert.Equal(t, helps, r.NumHelp)
 	assert.Equal(t, invalids, r.NumInvalid)
 	assert.Equal(t, stats, r.NumStat)
+	assert.Equal(t, olds, r.NumOld)
 }

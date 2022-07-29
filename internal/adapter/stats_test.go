@@ -27,8 +27,11 @@ func TestNewStatsRegistry_Get(t *testing.T) {
 	for i := 0; i < 20; i++ {
 		r.AddStat()
 	}
+	for i := 0; i < 30; i++ {
+		r.AddOld()
+	}
 	actual, err := r.Get(after)
-	expected := domain.NewStatsResult(time.Minute*10, 1000, 5, 10, 15, 20)
+	expected := domain.NewStatsResult(time.Minute*10, 1000, 5, 10, 15, 20, 30)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
 }

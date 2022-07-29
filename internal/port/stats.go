@@ -10,5 +10,6 @@ type StatsRegistry interface {
 	AddHelp()
 	AddInvalid()
 	AddStat()
+	AddOld()
 	Get(now time.Time) (domain.StatsResult, error)
 }

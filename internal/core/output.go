@@ -30,6 +30,7 @@ func GetStatsOutput(name string, stats domain.StatsResult) string {
 		fmt.Sprintf("Number of invalid rolls: %d", stats.NumInvalid),
 		fmt.Sprintf("Number of help requests: %d", stats.NumHelp),
 		fmt.Sprintf("Number of stats requests: %d", stats.NumStat),
+		fmt.Sprintf("Number of requests to old command: %d", stats.NumOld),
 	}
 	return strings.Join(lines, "\n")
 }

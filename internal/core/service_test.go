@@ -98,7 +98,8 @@ func TestService_HandleStats(t *testing.T) {
 		"\nNumber of rolls: 0" +
 		"\nNumber of invalid rolls: 0" +
 		"\nNumber of help requests: 0" +
-		"\nNumber of stats requests: 1"
+		"\nNumber of stats requests: 1" +
+		"\nNumber of requests to old command: 0"
 	actual, err := svc.HandleStats("Joe")
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)

@@ -24,14 +24,15 @@ func TestGetHelpOutput(t *testing.T) {
 
 func TestGetStatsOutput(t *testing.T) {
 	period := time.Minute * 68
-	stats := domain.NewStatsResult(period, 200, 100, 80, 60, 40)
+	stats := domain.NewStatsResult(period, 200, 100, 80, 60, 40, 20)
 	output := core.GetStatsOutput("John", stats)
 	expected := "John, here are stats over the past 1h8m0s" +
 		"\nNumber of servers: 200" +
 		"\nNumber of rolls: 100" +
 		"\nNumber of invalid rolls: 60" +
 		"\nNumber of help requests: 80" +
-		"\nNumber of stats requests: 40"
+		"\nNumber of stats requests: 40" +
+		"\nNumber of requests to old command: 20"
 	assert.Equal(t, expected, output)
 }
 

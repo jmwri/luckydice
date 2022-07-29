@@ -47,8 +47,14 @@ func (r *StatsRegistry) AddStat() {
 	r.stats = r.stats.AddStats(1)
 }
 
+func (r *StatsRegistry) AddOld() {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.stats = r.stats.AddOlds(1)
+}
+
 func (r *StatsRegistry) Get(now time.Time) (domain.StatsResult, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	return domain.NewStatsResult(now.Sub(r.start), r.guildCountProvider.GetGuildCount(), r.stats.NumRoll, r.stats.NumHelp, r.stats.NumInvalid, r.stats.NumStat), nil
+	return domain.NewStatsResult(now.Sub(r.start), r.guildCountProvider.GetGuildCount(), r.stats.NumRoll, r.stats.NumHelp, r.stats.NumInvalid, r.stats.NumStat, r.stats.NumOld), nil
 }

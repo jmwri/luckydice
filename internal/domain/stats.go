@@ -11,6 +11,7 @@ type Stats struct {
 	NumHelp    int
 	NumInvalid int
 	NumStat    int
+	NumOld     int
 }
 
 func (s Stats) AddRolls(n int) Stats {
@@ -33,7 +34,12 @@ func (s Stats) AddStats(n int) Stats {
 	return s
 }
 
-func NewStatsResult(period time.Duration, numGuild, numRoll, numHelp, numInvalid, numStat int) StatsResult {
+func (s Stats) AddOlds(n int) Stats {
+	s.NumOld += n
+	return s
+}
+
+func NewStatsResult(period time.Duration, numGuild, numRoll, numHelp, numInvalid, numStat, numOld int) StatsResult {
 	return StatsResult{
 		Period:     period,
 		NumGuild:   numGuild,
@@ -41,6 +47,7 @@ func NewStatsResult(period time.Duration, numGuild, numRoll, numHelp, numInvalid
 		NumHelp:    numHelp,
 		NumInvalid: numInvalid,
 		NumStat:    numStat,
+		NumOld:     numOld,
 	}
 }
 
@@ -51,4 +58,5 @@ type StatsResult struct {
 	NumHelp    int
 	NumInvalid int
 	NumStat    int
+	NumOld     int
 }
