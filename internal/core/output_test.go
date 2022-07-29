@@ -36,9 +36,10 @@ func TestGetStatsOutput(t *testing.T) {
 }
 
 func TestGetSuccessfulOutput(t *testing.T) {
+	rollInput := domain.NewRollInput(3, 20, 2)
 	rollOutput := domain.NewRollOutput([]int{1, 2, 3}, 2, 8)
-	output := core.GetSuccessfulOutput("John", rollOutput)
-	expected := "John rolled [1,2,3]+2. Result: **8**"
+	output := core.GetSuccessfulOutput("John", rollInput, rollOutput)
+	expected := "John rolled (3d20+2) [1,2,3]+2. Result: **8**"
 	assert.Equal(t, expected, output)
 }
 

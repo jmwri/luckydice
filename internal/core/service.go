@@ -23,16 +23,16 @@ type Service struct {
 func (s *Service) HandleRoll(name, input string) (string, error) {
 	input = strings.ToLower(input)
 	input = strings.TrimSpace(input)
-	output, err := s.roll(input)
+	rollInput, rollOutput, err := s.roll(input)
 	if err != nil {
 		return s.handleInvalid(name)
 	}
-	return s.handleSuccess(name, output)
+	return s.handleSuccess(name, rollInput, rollOutput)
 }
 
-func (s *Service) handleSuccess(name string, output domain.RollOutput) (string, error) {
+func (s *Service) handleSuccess(name string, input domain.RollInput, output domain.RollOutput) (string, error) {
 	s.stats.AddRoll()
-	return GetSuccessfulOutput(name, output), nil
+	return GetSuccessfulOutput(name, input, output), nil
 }
 
 func (s *Service) handleInvalid(name string) (string, error) {
@@ -65,15 +65,15 @@ func (s *Service) HandleRaw(name, input string) (string, error) {
 	return GetUpdatedOutput(name, s.opts.RollCmdName, s.opts.RollUtilCmdName), nil
 }
 
-func (s *Service) roll(input string) (domain.RollOutput, error) {
-	output := domain.RollOutput{}
-	roll, err := ParseRoll(input)
+func (s *Service) roll(input string) (domain.RollInput, domain.RollOutput, error) {
+	rollOutput := domain.RollOutput{}
+	rollInput, err := ParseRoll(input)
 	if err != nil {
-		return output, fmt.Errorf("failed to parse roll: %w", err)
+		return rollInput, rollOutput, fmt.Errorf("failed to parse roll: %w", err)
 	}
-	output, err = Roll(roll)
+	rollOutput, err = Roll(rollInput)
 	if err != nil {
-		return output, fmt.Errorf("failed to calculate")
+		return rollInput, rollOutput, fmt.Errorf("failed to calculate: %w", err)
 	}
-	return output, err
+	return rollInput, rollOutput, err
 }

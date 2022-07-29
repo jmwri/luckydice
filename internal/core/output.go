@@ -34,13 +34,19 @@ func GetStatsOutput(name string, stats domain.StatsResult) string {
 	return strings.Join(lines, "\n")
 }
 
-func GetSuccessfulOutput(name string, output domain.RollOutput) string {
+func GetSuccessfulOutput(name string, input domain.RollInput, output domain.RollOutput) string {
+	modSymbol := "+"
+	if input.Modifier < 0 {
+		modSymbol = "-"
+	}
+	inputStr := fmt.Sprintf("%dd%d%s%d", input.NumRolls, input.MaxRoll, modSymbol, input.Modifier)
+
 	stringRolls := make([]string, len(output.Rolls))
 	for k, v := range output.Rolls {
 		stringRolls[k] = strconv.Itoa(v)
 	}
 	rolls := strings.Join(stringRolls, ",")
-	return fmt.Sprintf("%s rolled [%s]%+d. Result: **%d**", name, rolls, output.Modifier, output.Result)
+	return fmt.Sprintf("%s rolled (%s) [%s]%+d. Result: **%d**", name, inputStr, rolls, output.Modifier, output.Result)
 }
 
 func GetUpdatedOutput(name, rollCmdName, rollUtilCmdName string) string {
