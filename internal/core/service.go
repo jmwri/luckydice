@@ -6,38 +6,61 @@ import (
 	"strings"
 )
 
-func NewService(messagePrefix string) *Service {
+func NewService(opts domain.ServiceOpts) *Service {
 	return &Service{
-		messagePrefix: messagePrefix,
-		stats:         domain.NewStats(),
+		opts:  opts,
+		stats: domain.NewStats(),
 	}
 }
 
 type Service struct {
-	messagePrefix string
-	stats         domain.ModifiableStats
+	opts  domain.ServiceOpts
+	stats domain.ModifiableStats
 }
 
-func (s *Service) Handle(name, input string) (string, error) {
+func (s *Service) HandleRoll(name, input string) (string, error) {
+	input = strings.ToLower(input)
+	input = strings.TrimSpace(input)
+	output, err := s.roll(input)
+	if err != nil {
+		return s.handleInvalid(name)
+	}
+	return s.handleSuccess(name, output)
+}
+
+func (s *Service) handleSuccess(name string, output domain.RollOutput) (string, error) {
+	s.stats.AddRoll()
+	return GetSuccessfulOutput(name, output), nil
+}
+
+func (s *Service) handleInvalid(name string) (string, error) {
+	s.stats.AddInvalid()
+	return GetInvalidOutput(name, s.opts.RollCmdName), nil
+}
+
+func (s *Service) HandleHelp(name string) (string, error) {
+	s.stats.AddHelp()
+	return GetHelpOutput(name, s.opts.RollUtilCmdName, s.opts.RollUtilHelpCmdName), nil
+}
+
+func (s *Service) HandleStats(name string) (string, error) {
+	s.stats.AddStat()
+	return GetHelpOutput(name, s.opts.RollUtilCmdName, s.opts.RollUtilHelpCmdName), nil
+}
+
+func (s *Service) HandleRaw(name, input string) (string, error) {
 	input = strings.ToLower(input)
 
-	if !strings.HasPrefix(input, s.messagePrefix) {
+	if !strings.HasPrefix(input, s.opts.OldPrefix) {
 		return "", nil
 	}
-	input = strings.TrimPrefix(input, s.messagePrefix)
+	input = strings.TrimPrefix(input, s.opts.OldPrefix)
 	input = strings.TrimSpace(input)
 
 	if input == "help" {
-		s.stats.AddHelp()
-		return GetHelpOutput(name, s.messagePrefix), nil
+		return s.HandleHelp(name)
 	}
-	output, err := s.roll(input)
-	if err != nil {
-		s.stats.AddInvalid()
-		return GetInvalidOutput(name, s.messagePrefix), nil
-	}
-	s.stats.AddRoll()
-	return GetSuccessfulOutput(name, output), nil
+	return s.HandleRoll(name, input)
 }
 
 func (s *Service) roll(input string) (domain.RollOutput, error) {

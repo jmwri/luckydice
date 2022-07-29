@@ -10,6 +10,7 @@ type Stats struct {
 	NumRoll    int
 	NumHelp    int
 	NumInvalid int
+	NumStat    int
 }
 
 type ModifiableStats struct {
@@ -41,6 +42,15 @@ func (s ModifiableStats) AddInvalids(n int) ModifiableStats {
 
 func (s ModifiableStats) AddInvalid() ModifiableStats {
 	return s.AddInvalids(1)
+}
+
+func (s ModifiableStats) AddStats(n int) ModifiableStats {
+	s.NumStat += n
+	return s
+}
+
+func (s ModifiableStats) AddStat() ModifiableStats {
+	return s.AddStats(1)
 }
 
 func (s ModifiableStats) Reset() ModifiableStats {

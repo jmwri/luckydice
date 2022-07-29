@@ -1,10 +1,8 @@
 package internal
 
-import (
-	"github.com/jmwri/luckydice/internal/domain"
-)
-
 type Service interface {
-	Handle(name, input string) (string, error)
-	Stats() domain.Stats
+	HandleRoll(name, input string) (string, error)
+	HandleHelp(name string) (string, error)
+	HandleStats(name string) (string, error)
+	HandleRaw(name, input string) (string, error)
 }

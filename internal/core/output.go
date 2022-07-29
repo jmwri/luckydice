@@ -7,15 +7,17 @@ import (
 	"strings"
 )
 
-func GetInvalidOutput(name, messagePrefix string) string {
-	return fmt.Sprintf("Sorry %s, I don't understand. You can ask me for help with `%s help`.", name, messagePrefix)
+func GetInvalidOutput(name string, commands ...string) string {
+	cmd := strings.Join(commands, " ")
+	return fmt.Sprintf("Sorry %s, I don't understand. You can ask me for help with `/%s`.", name, cmd)
 }
 
-func GetHelpOutput(name, messagePrefix string) string {
+func GetHelpOutput(name string, commands ...string) string {
+	cmd := strings.Join(commands, " ")
 	lines := []string{
-		fmt.Sprintf("Hi %s! You can use me by typing the following: `%s {number of rolls} d{sides on die} {modifier}`. For example: `%s 2 d20 +3`.", name, messagePrefix, messagePrefix),
+		fmt.Sprintf("Hi %s! You can use me by typing the following: `/%s {number of rolls} d{sides on die} {modifier}`. For example: `/%s 2 d20 +3`.", name, cmd, cmd),
 		fmt.Sprintf("All whitespace is optional, and you can exclude {number of rolls} and {modifier}."),
-		fmt.Sprintf("`%s 1d20+0` is the same as `%s d20`.", messagePrefix, messagePrefix),
+		fmt.Sprintf("`/%s 1d20+0` is the same as `/%s d20`.", cmd, cmd),
 	}
 	return strings.Join(lines, "\n")
 }
